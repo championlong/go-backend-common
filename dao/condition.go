@@ -59,6 +59,7 @@ func BuildWhereClause(SqlConditions []SqlCondition) (string, []interface{}) {
 	for _, condition := range SqlConditions {
 		if condition.Clause == "" {
 			BuildSingleWhereClause(&condition)
+
 		}
 		allQueries = append(allQueries, condition.Clause)
 		for _, v := range condition.Values {
