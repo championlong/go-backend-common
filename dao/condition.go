@@ -63,6 +63,7 @@ func BuildWhereClause(SqlConditions []SqlCondition) (string, []interface{}) {
 		allQueries = append(allQueries, condition.Clause)
 		for _, v := range condition.Values {
 			allValues = append(allValues, v)
+
 		}
 	}
 	whereClause := strings.Join(allQueries, " AND ")
