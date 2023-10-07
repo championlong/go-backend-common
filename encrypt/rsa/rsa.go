@@ -1,4 +1,4 @@
-package encrypt
+package rsa
 
 import (
 	"crypto"
@@ -30,11 +30,15 @@ func (this *RSAMethod) Sign(data []byte) ([]byte, error) {
 }
 
 func (this *RSAMethod) Verify(data []byte, signature []byte) error {
+	var err error
 	var h = this.h.New()
-	if _, err := h.Write(data); err != nil {
+	if _, err = h.Write(data); err != nil {
 		return err
 	}
 	var hashed = h.Sum(nil)
+	if signature, err = base64.StdEncoding.DecodeString(string(signature)); err != nil {
+		return err
+	}
 	return rsa.VerifyPKCS1v15(this.publicKey, this.h, hashed, signature)
 }
 
@@ -48,6 +52,19 @@ func (this *RSAMethod) SetPrivateKey(data []byte, parseFunc func(der []byte) (ke
 		return err
 	}
 	this.privateKey = privateKey.(*rsa.PrivateKey)
+	return nil
+}
+
+func (this *RSAMethod) SetPublicKey(data []byte, parseFunc func(der []byte) (value any, err error)) error {
+	n, err := rsaKeyDecode(data)
+	if err != nil {
+		return err
+	}
+	publicKey, err := parseFunc(n)
+	if err != nil {
+		return err
+	}
+	this.publicKey = publicKey.(*rsa.PublicKey)
 	return nil
 }
 

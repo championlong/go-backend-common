@@ -1,6 +1,7 @@
 package runner
 
 import (
+	"context"
 	"fmt"
 	"go-backend-common/util"
 	"os"
@@ -57,7 +58,6 @@ func (r *serviceRunner) handleStart() {
 		}
 	}()
 	if atomic.LoadInt32(&r.stopped) == 0 {
-		fmt.Println(22222)
 		r.wg.Done()
 	}
 }
@@ -92,6 +92,29 @@ func (r *serviceRunner) signalHandler() {
 
 func (r *serviceRunner) Wait() {
 	r.wg.Wait()
-	fmt.Println(44444)
+}
 
+type Job interface {
+	init() error
+	run(ctx context.Context)
+}
+
+type Jobs []Job
+
+func RegisterJobs(js ...Job) Jobs {
+	var jobs Jobs
+	for _, j := range js {
+		jobs = append(jobs, j)
+	}
+	return jobs
+}
+
+func (js Jobs) Start(ctx context.Context) error {
+	for _, j := range js {
+		if err := j.init(); err != nil {
+			return err
+		}
+		go util.SafeGoroutineByContext(ctx, j.run)
+	}
+	return nil
 }

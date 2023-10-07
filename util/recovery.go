@@ -1,27 +1,34 @@
 package util
 
 import (
+	"context"
 	"fmt"
 	"runtime"
 )
 
-func Recovery(funcs ...RecoveryFallBackFunc) {
+func RecoveryByCtx(format string, values ...interface{}) {
 	if r := recover(); r != nil {
-		recovered := false
-		if len(funcs) > 0 {
-			for _, fun := range funcs {
-				if fun != nil {
-					fun(r)
-					recovered = true
-				}
-			}
-		}
-		if !recovered {
-			buf := make([]byte, 1<<18)
-			n := runtime.Stack(buf, false)
-			fmt.Println(fmt.Sprintf("%v, STACK: %s", r, buf[0:n]))
-		}
+		buf := make([]byte, 1<<18)
+		n := runtime.Stack(buf, false)
+		ctx := fmt.Sprintf(format, values...)
+		fmt.Printf(ctx+". error: %+v. stack: %s", r, buf[0:n])
 	}
 }
 
-type RecoveryFallBackFunc func(interface{})
+func Recovery() {
+	if r := recover(); r != nil {
+		buf := make([]byte, 1<<18)
+		n := runtime.Stack(buf, false)
+		fmt.Printf(" %+v. stack: %s", r, buf[0:n])
+	}
+}
+
+func SafeGoroutine(f func()) {
+	defer Recovery()
+	f()
+}
+
+func SafeGoroutineByContext(ctx context.Context, f func(ctx context.Context)) {
+	defer Recovery()
+	f(ctx)
+}
