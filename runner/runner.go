@@ -37,10 +37,8 @@ func newServiceRunner(s Service) *serviceRunner {
 type serviceRunner struct {
 	signals chan os.Signal
 	service Service
-
 	stopped int32
-
-	wg sync.WaitGroup
+	wg      sync.WaitGroup
 }
 
 func (r *serviceRunner) run() {
