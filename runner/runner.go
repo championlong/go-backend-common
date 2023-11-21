@@ -1,7 +1,6 @@
 package runner
 
 import (
-	"context"
 	"fmt"
 	"go-backend-common/util"
 	"os"
@@ -12,7 +11,7 @@ import (
 	"time"
 )
 
-type Service interface {
+type IService interface {
 	Start() error
 	Stop() error
 }
@@ -21,13 +20,13 @@ type ServiceRunner interface {
 	Wait()
 }
 
-func RunService(s Service) ServiceRunner {
+func RunService(s IService) ServiceRunner {
 	r := newServiceRunner(s)
 	r.run()
 	return r
 }
 
-func newServiceRunner(s Service) *serviceRunner {
+func newServiceRunner(s IService) *serviceRunner {
 	return &serviceRunner{
 		signals: make(chan os.Signal, 1),
 		service: s,
@@ -36,7 +35,7 @@ func newServiceRunner(s Service) *serviceRunner {
 
 type serviceRunner struct {
 	signals chan os.Signal
-	service Service
+	service IService
 	stopped int32
 	wg      sync.WaitGroup
 }
@@ -90,29 +89,4 @@ func (r *serviceRunner) signalHandler() {
 
 func (r *serviceRunner) Wait() {
 	r.wg.Wait()
-}
-
-type Job interface {
-	init() error
-	run(ctx context.Context)
-}
-
-type Jobs []Job
-
-func RegisterJobs(js ...Job) Jobs {
-	var jobs Jobs
-	for _, j := range js {
-		jobs = append(jobs, j)
-	}
-	return jobs
-}
-
-func (js Jobs) Start(ctx context.Context) error {
-	for _, j := range js {
-		if err := j.init(); err != nil {
-			return err
-		}
-		go util.SafeGoroutineByContext(ctx, j.run)
-	}
-	return nil
 }
