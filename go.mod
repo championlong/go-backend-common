@@ -3,7 +3,7 @@ module go-backend-common
 go 1.18
 
 require (
-	github.com/championlong/go-backend-common/slog v0.0.0-00010101000000-000000000000
+	github.com/championlong/go-backend-common/slog v1.0.0
 	github.com/fatih/color v1.16.0
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/prometheus/client_golang v1.16.0

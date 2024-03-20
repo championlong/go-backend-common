@@ -21,7 +21,7 @@ func NewService() *Service {
 	svc.mux.HandleFunc("/debug/pprof/profile", pprof.Profile) // go tool pprof profile
 	svc.mux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
 	svc.mux.HandleFunc("/debug/pprof/trace", pprof.Trace)
-	go svc.Start(":8081")
+	go svc.Start(":6060")
 	return svc
 }
 

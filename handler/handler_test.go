@@ -12,9 +12,7 @@ func Test_Metrics(t *testing.T) {
 		Name:      "test_name",
 		Help:      "The count of test",
 	}, []string{"name"})
-
 	prometheus.MustRegister(cc)
-
 	for {
 		time.Sleep(100 * time.Millisecond)
 		cc.WithLabelValues("test_value").Inc()
