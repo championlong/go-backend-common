@@ -1,4 +1,4 @@
-package encrypt
+package crypto
 
 type Method interface {
 	Sign(data []byte) ([]byte, error)
