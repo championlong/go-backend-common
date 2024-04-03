@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/apache/thrift/lib/go/thrift"
 	hbase_thrift "github.com/championlong/go-backend-common/hbase/gen-go/hbase"
-	"strconv"
 	"sync/atomic"
 	"time"
 )
@@ -14,15 +13,9 @@ var noDeadline = time.Time{}
 type Conn struct {
 	socketConn thrift.TTransport
 	clientConn hbase_thrift.THBaseService
-
-	ProcessID int32
-	SecretKey int32
-	lastID    int64
-
-	createdAt time.Time
-	usedAt    uint32 // atomic
-	pooled    bool
-	Inited    bool
+	createdAt  time.Time
+	usedAt     uint32 // atomic
+	pooled     bool
 }
 
 func NewConn(socketConn thrift.TTransport, factory thrift.TProtocolFactory) *Conn {
@@ -56,9 +49,8 @@ func (cn *Conn) SocketConn() thrift.TTransport {
 	return cn.socketConn
 }
 
-func (cn *Conn) NextID() string {
-	cn.lastID++
-	return strconv.FormatInt(cn.lastID, 10)
+func (cn *Conn) HbaseClient() hbase_thrift.THBaseService {
+	return cn.clientConn
 }
 
 func (cn *Conn) Close() error {

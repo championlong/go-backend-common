@@ -46,21 +46,25 @@ type Options struct {
 func (opt *Options) init() {
 	if opt.Dialer == nil {
 		opt.Dialer = func(ctx context.Context, thriftHost string, config *thrift.TConfiguration) (thrift.TTransport, error) {
-			if opt.ThriftConfig == nil {
-				opt.ThriftConfig = &thrift.TConfiguration{
-					ConnectTimeout:     time.Second * 60,
-					SocketTimeout:      time.Second * 60,
-					TBinaryStrictRead:  thrift.BoolPtr(true),
-					TBinaryStrictWrite: thrift.BoolPtr(true),
+			if config == nil {
+				config = &thrift.TConfiguration{
+					ConnectTimeout: time.Second * 60,
+					SocketTimeout:  time.Second * 60,
 				}
 			}
-			tSocket := thrift.NewTSocketConf(thriftHost, opt.ThriftConfig)
+			tSocket := thrift.NewTSocketConf(thriftHost, config)
 			return tSocket, nil
 		}
 	}
 
 	if opt.Factory == nil {
 		opt.Factory = func(ctx context.Context, config *thrift.TConfiguration) thrift.TProtocolFactory {
+			if config == nil {
+				config = &thrift.TConfiguration{
+					TBinaryStrictRead:  thrift.BoolPtr(true),
+					TBinaryStrictWrite: thrift.BoolPtr(true),
+				}
+			}
 			return thrift.NewTBinaryProtocolFactoryConf(config)
 		}
 	}
