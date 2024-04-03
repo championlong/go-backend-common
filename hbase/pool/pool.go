@@ -3,11 +3,12 @@ package pool
 import (
 	"context"
 	"errors"
-	"github.com/apache/thrift/lib/go/thrift"
-	"github.com/championlong/go-backend-common/slog"
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"github.com/apache/thrift/lib/go/thrift"
+	"github.com/championlong/go-backend-common/slog"
 )
 
 var (

@@ -2,9 +2,10 @@ package service
 
 import (
 	"fmt"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"net/http"
 	"net/http/pprof"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type Service struct {

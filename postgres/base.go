@@ -2,9 +2,10 @@ package postgres
 
 import (
 	"fmt"
-	"github.com/go-pg/pg/v10"
-	"postgres/config"
 	"time"
+
+	"github.com/championlong/go-backend-common/postgres/config"
+	"github.com/go-pg/pg/v10"
 )
 
 type DatabaseGroup struct {

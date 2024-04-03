@@ -10,9 +10,10 @@ import (
 	"runtime"
 	"strings"
 
+	"go-backend-common/viper"
+
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
-	"go-backend-common/viper"
 )
 
 // Command is a sub command structure of a cli application.

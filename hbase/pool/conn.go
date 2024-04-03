@@ -2,10 +2,11 @@ package pool
 
 import (
 	"context"
-	"github.com/apache/thrift/lib/go/thrift"
-	hbase_thrift "github.com/championlong/go-backend-common/hbase/gen-go/hbase"
 	"sync/atomic"
 	"time"
+
+	"github.com/apache/thrift/lib/go/thrift"
+	hbase_thrift "github.com/championlong/go-backend-common/hbase/gen-go/hbase"
 )
 
 var noDeadline = time.Time{}
