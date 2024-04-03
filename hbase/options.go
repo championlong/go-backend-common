@@ -2,10 +2,11 @@ package hbase
 
 import (
 	"context"
-	"github.com/apache/thrift/lib/go/thrift"
-	"github.com/championlong/go-backend-common/hbase/pool"
 	"runtime"
 	"time"
+
+	"github.com/apache/thrift/lib/go/thrift"
+	"github.com/championlong/go-backend-common/hbase/pool"
 )
 
 // Options contains database connection options.

@@ -6,8 +6,9 @@ package app
 
 import (
 	"fmt"
-	"github.com/championlong/go-backend-common/slog"
 	"os"
+
+	"github.com/championlong/go-backend-common/slog"
 
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"

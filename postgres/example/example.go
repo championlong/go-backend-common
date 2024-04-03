@@ -3,9 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
+
+	"github.com/championlong/go-backend-common/postgres"
+	"github.com/championlong/go-backend-common/postgres/config"
 	"github.com/go-pg/pg/v10"
-	"postgres"
-	"postgres/config"
 )
 
 func main() {

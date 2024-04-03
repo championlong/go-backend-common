@@ -2,6 +2,7 @@ package hbase
 
 import (
 	"context"
+
 	"github.com/championlong/go-backend-common/hbase/gen-go/hbase"
 	"github.com/championlong/go-backend-common/hbase/pool"
 )

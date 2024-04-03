@@ -3,9 +3,10 @@ package hbase
 import (
 	"context"
 	"fmt"
+	"testing"
+
 	"github.com/championlong/go-backend-common/hbase/gen-go/hbase"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 var (
