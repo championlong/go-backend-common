@@ -7,7 +7,7 @@ import (
 	"sync/atomic"
 	"syscall"
 
-	"go-backend-common/utils"
+	"go-backend-common/util"
 
 	"github.com/championlong/go-backend-common/slog"
 )
@@ -47,7 +47,7 @@ func (r *serviceRunner) run() {
 
 func (r *serviceRunner) handleStart() {
 	func() {
-		defer utils.Recovery()
+		defer util.Recovery()
 		err := r.service.Start()
 		if err != nil {
 			slog.Errorf("handler start: %s", err.Error())

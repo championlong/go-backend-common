@@ -2,7 +2,7 @@ package runner
 
 import (
 	"context"
-	"go-backend-common/utils"
+	"go-backend-common/util"
 )
 
 type Job interface {
@@ -25,7 +25,7 @@ func (js Jobs) Start(ctx context.Context) error {
 		if err := j.init(); err != nil {
 			return err
 		}
-		go utils.SafeGoroutineByContext(ctx, j.run)
+		go util.SafeGoroutineByContext(ctx, j.run)
 	}
 	return nil
 }

@@ -10,8 +10,6 @@ import (
 	"runtime"
 	"strings"
 
-	"go-backend-common/viper"
-
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
@@ -22,7 +20,7 @@ import (
 type Command struct {
 	usage    string
 	desc     string
-	options  viper.CliOptions
+	options  CliOptions
 	commands []*Command
 	runFunc  RunCommandFunc
 }
@@ -33,7 +31,7 @@ type CommandOption func(*Command)
 
 // WithCommandOptions to open the application's function to read from the
 // command line.
-func WithCommandOptions(opt viper.CliOptions) CommandOption {
+func WithCommandOptions(opt CliOptions) CommandOption {
 	return func(c *Command) {
 		c.options = opt
 	}
@@ -90,6 +88,11 @@ func (c *Command) cobraCommand() *cobra.Command {
 	if c.runFunc != nil {
 		cmd.Run = c.runCommand
 	}
+	if c.options != nil {
+		for _, f := range c.options.Flags().FlagSets {
+			cmd.Flags().AddFlagSet(f)
+		}
+	}
 	addHelpCommandFlag(c.usage, cmd.Flags())
 
 	return cmd
@@ -102,16 +105,6 @@ func (c *Command) runCommand(cmd *cobra.Command, args []string) {
 			os.Exit(1)
 		}
 	}
-}
-
-// AddCommand adds sub command to the application.
-func (a *App) AddCommand(cmd *Command) {
-	a.commands = append(a.commands, cmd)
-}
-
-// AddCommands adds multiple sub commands to the application.
-func (a *App) AddCommands(cmds ...*Command) {
-	a.commands = append(a.commands, cmds...)
 }
 
 // FormatBaseName is formatted as an executable file name under different

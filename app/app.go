@@ -6,9 +6,11 @@ package app
 
 import (
 	"fmt"
+	"go-backend-common/util/term"
 	"os"
 
 	"github.com/championlong/go-backend-common/slog"
+	"github.com/spf13/viper"
 
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
@@ -24,6 +26,8 @@ type App struct {
 	description string
 	runFunc     RunFunc
 	silence     bool
+	noConfig    bool
+	options     CliOptions
 	commands    []*Command
 	args        cobra.PositionalArgs
 	cmd         *cobra.Command
@@ -43,6 +47,21 @@ func WithRunFunc(run RunFunc) Option {
 	}
 }
 
+// WithOptions to open the application's function to read from the command line
+// or read parameters from the configuration file.
+func WithOptions(opt CliOptions) Option {
+	return func(a *App) {
+		a.options = opt
+	}
+}
+
+// WithNoConfig set the application does not provide config flag.
+func WithNoConfig() Option {
+	return func(a *App) {
+		a.noConfig = true
+	}
+}
+
 // WithDescription is used to set the description of the application.
 func WithDescription(desc string) Option {
 	return func(a *App) {
@@ -56,6 +75,12 @@ func WithDescription(desc string) Option {
 func WithSilence() Option {
 	return func(a *App) {
 		a.silence = true
+	}
+}
+
+func WithCommand(commands *Command) Option {
+	return func(a *App) {
+		a.commands = append(a.commands, commands)
 	}
 }
 
@@ -112,6 +137,7 @@ func (a *App) buildCommand() {
 	cmd.SetOut(os.Stdout)
 	cmd.SetErr(os.Stderr)
 	cmd.Flags().SortFlags = true
+	InitFlags(cmd.Flags())
 
 	if len(a.commands) > 0 {
 		for _, command := range a.commands {
@@ -123,6 +149,23 @@ func (a *App) buildCommand() {
 		cmd.RunE = a.runCommand
 	}
 
+	var namedFlagSets NamedFlagSets
+	if a.options != nil {
+		namedFlagSets = a.options.Flags()
+		fs := cmd.Flags()
+		for _, f := range namedFlagSets.FlagSets {
+			fs.AddFlagSet(f)
+		}
+	}
+
+	if !a.noConfig {
+		addConfigFlag(a.basename, namedFlagSets.FlagSet("global"))
+	}
+	AddGlobalFlags(namedFlagSets.FlagSet("global"), cmd.Name())
+	// add new global flagset to cmd FlagSet
+	cmd.Flags().AddFlagSet(namedFlagSets.FlagSet("global"))
+
+	//addCmdTemplate(&cmd, namedFlagSets)
 	a.cmd = &cmd
 }
 
@@ -141,9 +184,50 @@ func (a *App) Command() *cobra.Command {
 
 func (a *App) runCommand(cmd *cobra.Command, args []string) error {
 	printWorkingDir()
-	// run application
+	PrintFlags(cmd.Flags())
+
+	if !a.noConfig {
+		if err := viper.BindPFlags(cmd.Flags()); err != nil {
+			return err
+		}
+
+		if err := viper.Unmarshal(a.options); err != nil {
+			return err
+		}
+	}
+
+	if !a.silence {
+		slog.Infof("%v Starting %s ...", progressMessage, a.name)
+		if !a.noConfig {
+			slog.Infof("%v Config file used: `%s`", progressMessage, viper.ConfigFileUsed())
+		}
+	}
+	if a.options != nil {
+		if err := a.applyOptionRules(); err != nil {
+			return err
+		}
+	}
+
 	if a.runFunc != nil {
 		return a.runFunc(a.basename)
+	}
+
+	return nil
+}
+
+func (a *App) applyOptionRules() error {
+	if completeableOptions, ok := a.options.(CompleteableOptions); ok {
+		if err := completeableOptions.Complete(); err != nil {
+			return err
+		}
+	}
+
+	if errs := a.options.Validate(); len(errs) != 0 {
+		return fmt.Errorf("%+v", errs)
+	}
+
+	if printableOptions, ok := a.options.(PrintableOptions); ok && !a.silence {
+		slog.Infof("%v Config: `%s`", progressMessage, printableOptions.String())
 	}
 
 	return nil
@@ -152,4 +236,19 @@ func (a *App) runCommand(cmd *cobra.Command, args []string) error {
 func printWorkingDir() {
 	wd, _ := os.Getwd()
 	slog.Infof("%v WorkingDir: %s", progressMessage, wd)
+}
+
+func addCmdTemplate(cmd *cobra.Command, namedFlagSets NamedFlagSets) {
+	usageFmt := "Usage:\n  %s\n"
+	cols, _, _ := term.TerminalSize(cmd.OutOrStdout())
+	cmd.SetUsageFunc(func(cmd *cobra.Command) error {
+		fmt.Fprintf(cmd.OutOrStderr(), usageFmt, cmd.UseLine())
+		PrintSections(cmd.OutOrStderr(), namedFlagSets, cols)
+
+		return nil
+	})
+	cmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
+		fmt.Fprintf(cmd.OutOrStdout(), "%s\n\n"+usageFmt, cmd.Long, cmd.UseLine())
+		PrintSections(cmd.OutOrStdout(), namedFlagSets, cols)
+	})
 }
