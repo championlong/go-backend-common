@@ -3,9 +3,10 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"github.com/go-pg/pg/v10"
-	"postgres/config"
 	"sync"
+
+	"github.com/championlong/go-backend-common/postgres/config"
+	"github.com/go-pg/pg/v10"
 )
 
 var DatabaseShardInstance DatabaseShard

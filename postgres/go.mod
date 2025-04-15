@@ -1,4 +1,4 @@
-module postgres
+module github.com/championlong/go-backend-common/postgres
 
 go 1.18
 

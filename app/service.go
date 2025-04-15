@@ -7,8 +7,9 @@ import (
 	"sync/atomic"
 	"syscall"
 
-	"github.com/championlong/go-backend-common/slog"
 	"go-backend-common/utils"
+
+	"github.com/championlong/go-backend-common/slog"
 )
 
 type Service interface {

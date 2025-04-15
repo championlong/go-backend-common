@@ -3,9 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
+
+	"github.com/championlong/go-backend-common/postgres"
+	"github.com/championlong/go-backend-common/postgres/config"
 	"github.com/go-pg/pg/v10"
-	"postgres"
-	"postgres/config"
 )
 
 func main() {
@@ -23,15 +24,17 @@ func main() {
 						FromLogicalShardMod: 0,
 						ToLogicalShardMod:   0,
 						Master: config.PostgresConfig{
-							Address: "127.0.0.1",
-							Port:    "5432",
-							User:    "mac",
+							Address:  "127.0.0.1",
+							Port:     "5432",
+							User:     "postgres",
+							Database: "postgres",
 						},
 						Slaves: []config.PostgresConfig{
 							{
-								Address: "127.0.0.1",
-								Port:    "5432",
-								User:    "mac",
+								Address:  "127.0.0.1",
+								Port:     "5432",
+								User:     "postgres",
+								Database: "postgres",
 							},
 						},
 					},
@@ -41,14 +44,15 @@ func main() {
 						Master: config.PostgresConfig{
 							Address:  "127.0.0.1",
 							Port:     "5432",
-							User:     "mac",
-							Database: "putong-market",
+							User:     "postgres",
+							Database: "postgres",
 						},
 						Slaves: []config.PostgresConfig{
 							{
-								Address: "127.0.0.1",
-								Port:    "5432",
-								User:    "mac",
+								Address:  "127.0.0.1",
+								Port:     "5432",
+								User:     "postgres",
+								Database: "postgres",
 							},
 						},
 					},
