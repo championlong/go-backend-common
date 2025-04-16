@@ -14,6 +14,7 @@
 | viper    | 集成 fsnotify 和 vipe 实现多种格式的配置文件                                            | https://github.com/fsnotify/fsnotify https://github.com/spf13/viper |
 | sql      | 实现动态拼接where条件，生成查询sql                                                     |                                                                     |
 | app      | 实现统一服务初始化模版                                                               |                                                                     |
+| qrcode   | 生成带log的二维码                                                                |                                                                     |
 
 ## 目录结构
 
